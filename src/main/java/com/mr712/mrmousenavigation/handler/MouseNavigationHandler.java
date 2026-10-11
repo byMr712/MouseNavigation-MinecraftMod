@@ -2,26 +2,27 @@ package com.mr712.mrmousenavigation.handler;
 
 import com.mr712.mrmousenavigation.config.MouseNavigationConfig;
 import com.mr712.mrmousenavigation.mixin.AdvancementsScreenAccessor;
-import com.mr712.mrmousenavigation.mixin.CreativeInventoryScreenAccessor;
-import com.mr712.mrmousenavigation.mixin.RecipeBookResultsAccessor;
-import com.mr712.mrmousenavigation.mixin.RecipeBookWidgetAccessor;
-import net.minecraft.advancement.AdvancementEntry;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.advancement.AdvancementTab;
-import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
-import net.minecraft.client.gui.screen.ingame.BookEditScreen;
-import net.minecraft.client.gui.screen.ingame.BookScreen;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.LecternScreen;
-import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
-import net.minecraft.client.gui.screen.recipebook.RecipeBookResults;
-import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.sound.SoundEvents;
+import com.mr712.mrmousenavigation.mixin.CreativeModeInventoryScreenAccessor;
+import com.mr712.mrmousenavigation.mixin.RecipeBookComponentAccessor;
+import com.mr712.mrmousenavigation.mixin.RecipeBookPageAccessor;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.advancements.AdvancementTab;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
+import net.minecraft.client.gui.screens.inventory.BookEditScreen;
+import net.minecraft.client.gui.screens.inventory.BookViewScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.LecternScreen;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
+import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.multiplayer.ClientAdvancements;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Field;
@@ -41,8 +42,8 @@ public class MouseNavigationHandler {
             return false;
         }
 
-        MinecraftClient client = MinecraftClient.getInstance();
-        Screen currentScreen = client.currentScreen;
+        Minecraft client = Minecraft.getInstance();
+        Screen currentScreen = client.screen;
         if (currentScreen == null) {
             FORWARD_STACK.clear();
             lastClosedScreen = null;
@@ -89,7 +90,7 @@ public class MouseNavigationHandler {
         }
 
         // 2. Books & Lecterns
-        if (currentScreen instanceof BookScreen || currentScreen instanceof LecternScreen || currentScreen instanceof BookEditScreen) {
+        if (currentScreen instanceof BookViewScreen || currentScreen instanceof LecternScreen || currentScreen instanceof BookEditScreen) {
             if (config.enableBooks) {
                 int key = isBack ? GLFW.GLFW_KEY_PAGE_UP : GLFW.GLFW_KEY_PAGE_DOWN;
                 if (currentScreen.keyPressed(key, 0, 0)) {
@@ -106,36 +107,31 @@ public class MouseNavigationHandler {
         }
 
         // 3. Creative Inventory Tabs
-        if (currentScreen instanceof CreativeInventoryScreen creativeScreen) {
+        if (currentScreen instanceof CreativeModeInventoryScreen creativeScreen) {
             if (config.enableCreativeTabs) {
-                List<ItemGroup> tabs = ItemGroups.getGroups();
-                if (tabs.size() > 1) {
-                    ItemGroup currentTab = CreativeInventoryScreenAccessor.mrmousenavigation$getSelectedTab();
+                List<CreativeModeTab> tabs = CreativeModeTabs.tabs();
+                if (tabs != null && tabs.size() > 1) {
+                    CreativeModeTab currentTab = CreativeModeInventoryScreenAccessor.mrmousenavigation$getSelectedTab();
                     int currentIndex = tabs.indexOf(currentTab);
                     if (currentIndex == -1) {
                         currentIndex = 0;
                     }
                     int newIndex = isBack ? (currentIndex - 1 + tabs.size()) % tabs.size() : (currentIndex + 1) % tabs.size();
                     if (newIndex != currentIndex) {
-                        ((CreativeInventoryScreenAccessor) creativeScreen).mrmousenavigation$setSelectedTab(tabs.get(newIndex));
+                        CreativeModeTab targetTab = tabs.get(newIndex);
+                        ((CreativeModeInventoryScreenAccessor) creativeScreen).mrmousenavigation$selectTab(targetTab);
                         playClickSound(client, config);
                         return true;
                     }
                 }
             }
-            if (isBack && config.enableScreenBack) {
-                triggerBack(currentScreen);
-                playClickSound(client, config);
-                return true;
-            }
-            return false;
         }
 
-        // 4. Advancements Screen
-        if (config.enableAdvancements) {
-            if (currentScreen instanceof AdvancementsScreen advancementsScreen) {
-                AdvancementsScreenAccessor accessor = (AdvancementsScreenAccessor) advancementsScreen;
-                Map<AdvancementEntry, AdvancementTab> tabsMap = accessor.mrmousenavigation$getTabs();
+        // 4. Advancements Tabs (Vanilla or Modded fallback)
+        if (currentScreen instanceof AdvancementsScreen advScreen) {
+            if (config.enableAdvancements) {
+                AdvancementsScreenAccessor accessor = (AdvancementsScreenAccessor) advScreen;
+                Map<AdvancementHolder, AdvancementTab> tabsMap = accessor.mrmousenavigation$getTabs();
                 if (tabsMap != null && tabsMap.size() > 1) {
                     List<AdvancementTab> tabs = new ArrayList<>(tabsMap.values());
                     AdvancementTab currentTab = accessor.mrmousenavigation$getSelectedTab();
@@ -146,38 +142,37 @@ public class MouseNavigationHandler {
                     int newIndex = isBack ? (currentIndex - 1 + tabs.size()) % tabs.size() : (currentIndex + 1) % tabs.size();
                     if (newIndex != currentIndex) {
                         AdvancementTab newTab = tabs.get(newIndex);
-                        advancementsScreen.selectTab(newTab.getRoot().getAdvancementEntry());
-                        accessor.mrmousenavigation$getAdvancementHandler().selectTab(newTab.getRoot().getAdvancementEntry(), true);
+                        AdvancementHolder holder = newTab.getRootNode().holder();
+                        advScreen.onSelectedTabChanged(holder);
+                        ClientAdvancements clientAdv = accessor.mrmousenavigation$getAdvancements();
+                        if (clientAdv != null) {
+                            clientAdv.setSelectedTab(holder, true);
+                        }
                         playClickSound(client, config);
                         return true;
                     }
                 }
-                return true;
             }
-
-            if (currentScreen.getClass().getName().contains("BetterAdvancementsScreen")
-                    || currentScreen.getClass().getSimpleName().contains("Advancement")) {
-                if (handleModdedAdvancements(currentScreen, isBack, client, config)) {
-                    return true;
-                }
+        } else if (currentScreen.getClass().getName().toLowerCase().contains("advancement") && config.enableAdvancements) {
+            if (handleModdedAdvancements(currentScreen, isBack, client, config)) {
                 return true;
             }
         }
 
-        // 5. Recipe Book Screens (Crafting, Inventory, etc.)
-        if (config.enableRecipeBook && currentScreen instanceof RecipeBookProvider recipeBookProvider) {
-            RecipeBookWidget recipeBookWidget = recipeBookProvider.getRecipeBookWidget();
-            if (recipeBookWidget != null && recipeBookWidget.isOpen()) {
-                RecipeBookResults results = ((RecipeBookWidgetAccessor) recipeBookWidget).mrmousenavigation$getRecipesArea();
-                if (results != null) {
-                    RecipeBookResultsAccessor resultsAccessor = (RecipeBookResultsAccessor) results;
-                    int totalPages = resultsAccessor.mrmousenavigation$getPageCount();
+        // 5. Recipe Book Pages
+        if (currentScreen instanceof RecipeUpdateListener recipeListener && config.enableRecipeBook) {
+            RecipeBookComponent recipeBook = recipeListener.getRecipeBookComponent();
+            if (recipeBook != null && recipeBook.isVisible()) {
+                RecipeBookPage page = ((RecipeBookComponentAccessor) recipeBook).mrmousenavigation$getRecipeBookPage();
+                if (page != null) {
+                    RecipeBookPageAccessor pageAccessor = (RecipeBookPageAccessor) page;
+                    int totalPages = pageAccessor.mrmousenavigation$getTotalPages();
                     if (totalPages > 1) {
-                        int currentPage = resultsAccessor.mrmousenavigation$getCurrentPage();
+                        int currentPage = pageAccessor.mrmousenavigation$getCurrentPage();
                         int newPage = isBack ? (currentPage - 1 + totalPages) % totalPages : (currentPage + 1) % totalPages;
                         if (newPage != currentPage) {
-                            resultsAccessor.mrmousenavigation$setCurrentPage(newPage);
-                            resultsAccessor.mrmousenavigation$refreshResultButtons();
+                            pageAccessor.mrmousenavigation$setCurrentPage(newPage);
+                            pageAccessor.mrmousenavigation$updateButtonsForPage();
                             playClickSound(client, config);
                             return true;
                         }
@@ -208,7 +203,7 @@ public class MouseNavigationHandler {
         return false;
     }
 
-    private static boolean handleModdedAdvancements(Screen screen, boolean isBack, MinecraftClient client, MouseNavigationConfig config) {
+    private static boolean handleModdedAdvancements(Screen screen, boolean isBack, Minecraft client, MouseNavigationConfig config) {
         try {
             Field tabsField = null;
             Field selectedTabField = null;
@@ -308,7 +303,7 @@ public class MouseNavigationHandler {
     private static void triggerBack(Screen currentScreen) {
         recordClosedScreen(currentScreen);
         if (!currentScreen.keyPressed(GLFW.GLFW_KEY_ESCAPE, 0, 0)) {
-            currentScreen.close();
+            currentScreen.onClose();
         }
     }
 
@@ -322,9 +317,9 @@ public class MouseNavigationHandler {
         }
     }
 
-    private static void playClickSound(MinecraftClient client, MouseNavigationConfig config) {
+    private static void playClickSound(Minecraft client, MouseNavigationConfig config) {
         if (config.enableSound && client.getSoundManager() != null) {
-            client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK.value(), 1.0F));
+            client.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
         }
     }
 
