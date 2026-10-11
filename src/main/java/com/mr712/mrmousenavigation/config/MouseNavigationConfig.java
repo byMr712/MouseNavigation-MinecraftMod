@@ -2,7 +2,6 @@ package com.mr712.mrmousenavigation.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +12,18 @@ import java.io.FileWriter;
 public class MouseNavigationConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger("MrMouseNavigation");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().toFile(), "mrmousenavigation.json");
+    private static final File CONFIG_FILE = resolveConfigFile();
+
+    private static File resolveConfigFile() {
+        try {
+            Class<?> flClass = Class.forName("net.fabricmc.loader.api.FabricLoader");
+            Object flInstance = flClass.getMethod("getInstance").invoke(null);
+            java.nio.file.Path p = (java.nio.file.Path) flClass.getMethod("getConfigDir").invoke(flInstance);
+            return new File(p.toFile(), "mrmousenavigation.json");
+        } catch (Throwable ignored) {
+            return new File(new File("config"), "mrmousenavigation.json");
+        }
+    }
 
     private static MouseNavigationConfig INSTANCE;
 
