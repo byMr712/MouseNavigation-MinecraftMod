@@ -1,0 +1,30 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="Apache-2.0"
+issueTrackerURL="https://github.com/byMr712/MrMouseNavigation-MinecraftMod/issues"
+
+[[mods]]
+modId="mrmousenavigation"
+version="${version}"
+displayName="[MR] Mouse Navigation"
+displayURL="https://github.com/byMr712/MrMouseNavigation-MinecraftMod"
+authors="byMr712"
+description="Enables mouse side buttons (Mouse 4 and Mouse 5) for intuitive back and forward navigation in screens, books, tabs, recipe books, and chat."
+logoFile="icon.png"
+
+[[mixins]]
+config="mrmousenavigation.mixins.json"
+
+[[dependencies.mrmousenavigation]]
+modId="neoforge"
+type="required"
+versionRange="[1,)"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.mrmousenavigation]]
+modId="minecraft"
+type="required"
+versionRange="[${minecraft_version}]"
+ordering="NONE"
+side="CLIENT"
