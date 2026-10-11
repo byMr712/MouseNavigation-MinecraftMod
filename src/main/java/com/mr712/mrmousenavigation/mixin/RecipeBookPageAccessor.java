@@ -1,14 +1,14 @@
 package com.mr712.mrmousenavigation.mixin;
 
-import net.minecraft.client.gui.screen.recipebook.RecipeBookResults;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(RecipeBookResults.class)
-public interface RecipeBookResultsAccessor {
-    @Accessor("pageCount")
-    int mrmousenavigation$getPageCount();
+@Mixin(RecipeBookPage.class)
+public interface RecipeBookPageAccessor {
+    @Accessor("totalPages")
+    int mrmousenavigation$getTotalPages();
 
     @Accessor("currentPage")
     int mrmousenavigation$getCurrentPage();
@@ -16,6 +16,6 @@ public interface RecipeBookResultsAccessor {
     @Accessor("currentPage")
     void mrmousenavigation$setCurrentPage(int page);
 
-    @Invoker("refreshResultButtons")
-    void mrmousenavigation$refreshResultButtons();
+    @Invoker("updateButtonsForPage")
+    void mrmousenavigation$updateButtonsForPage();
 }
