@@ -5,12 +5,13 @@
 ![Java 25](https://img.shields.io/badge/Java-25-blue.svg)
 ![Minecraft](https://img.shields.io/badge/Minecraft-26.1.2-blue.svg)
 ![Fabric](https://img.shields.io/badge/Loader-Fabric-blue.svg)
+![NeoForge](https://img.shields.io/badge/Loader-NeoForge-blue.svg)
 ![ModMenu](https://img.shields.io/badge/ModMenu-Supported-blue.svg)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
 
 ## About the Mod
 
-**[MR] Mouse Navigation** is a client-side Fabric mod for **Minecraft 26.1.2**, enabling navigation using mouse side buttons in game interfaces. With it, the lower side mouse button (Mouse 4) acts as "Back", the upper side button (Mouse 5) acts as "Forward", and the middle mouse button (scroll wheel click) allows sending chat messages, while your configured mouse controls in the game remain unchanged!
+**[MR] Mouse Navigation** is a client-side mod for **Minecraft 26.1.2 (Fabric & NeoForge)**, enabling navigation using mouse side buttons in game interfaces. With it, the lower side mouse button (Mouse 4) acts as "Back", the upper side button (Mouse 5) acts as "Forward", and the middle mouse button (scroll wheel click) allows sending chat messages, while your configured mouse controls in the game remain unchanged!
 
 ## Gallery
 
@@ -82,8 +83,8 @@ The mod is ported and maintained across all versions in separate git branches:
 
 ## Installation
 
-1. Download `MrMouseNavigation-Fabric-26.1.2-byMr712-v1.0.jar` from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mr-mouse-navigation) or [GitHub Releases](https://github.com/byMr712/MrMouseNavigation-MinecraftMod/releases).
-2. Ensure you have **Fabric Loader** installed (Fabric API is not required).
+1. Download `MrMouseNavigation-Fabric-26.1.2-byMr712-v1.0.jar` (for Fabric) or `MrMouseNavigation-NeoForge-26.1.2-byMr712-v1.0.jar` (for NeoForge) from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mr-mouse-navigation) or [GitHub Releases](https://github.com/byMr712/MrMouseNavigation-MinecraftMod/releases).
+2. Ensure you have **Fabric Loader** or **NeoForge** installed (no extra APIs required).
 3. Place the downloaded `.jar` into your `.minecraft/mods` folder.
 4. Launch the game!
 
@@ -99,7 +100,9 @@ The mod is ported and maintained across all versions in separate git branches:
    ```bash
    ./gradlew build
    ```
-3. The built JAR file will be in `build/libs/MrMouseNavigation-Fabric-26.1.2-byMr712-v1.0.jar`.
+3. The built JAR files will be in `build/libs/`:
+   - `MrMouseNavigation-Fabric-26.1.2-byMr712-v1.0.jar` (Fabric)
+   - `MrMouseNavigation-NeoForge-26.1.2-byMr712-v1.0.jar` (NeoForge)
 
 ## License
 
