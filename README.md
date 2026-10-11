@@ -5,12 +5,13 @@
 ![Java 25](https://img.shields.io/badge/Java-25-blue.svg)
 ![Minecraft](https://img.shields.io/badge/Minecraft-26.2-blue.svg)
 ![Fabric](https://img.shields.io/badge/Loader-Fabric-blue.svg)
+![NeoForge](https://img.shields.io/badge/Loader-NeoForge-blue.svg)
 ![ModMenu](https://img.shields.io/badge/ModMenu-Supported-blue.svg)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
 
 ## О моде
 
-**[MR] Mouse Navigation** - клиентский мод для **Minecraft 26.2 (Fabric)**, добавляющий навигацию боковыми кнопками мыши в интерфейсах игры. С ним нижняя боковая кнопка мыши (Mouse 4) работает как «Назад», верхняя боковая кнопка (Mouse 5) — как «Вперёд», а средняя кнопка мыши (колёсико / СКМ) позволяет отправлять сообщения в чате, при этом настроенная мышь в игре не меняется!
+**[MR] Mouse Navigation** - клиентский мод для **Minecraft 26.2 (Fabric & NeoForge)**, добавляющий навигацию боковыми кнопками мыши в интерфейсах игры. С ним нижняя боковая кнопка мыши (Mouse 4) работает как «Назад», верхняя боковая кнопка (Mouse 5) — как «Вперёд», а средняя кнопка мыши (колёсико / СКМ) позволяет отправлять сообщения в чате, при этом настроенная мышь в игре не меняется!
 
 ## Галерея
 ![Меню конфигурации](/images/Mouse_navigation_modmenu_ru.png)
@@ -81,8 +82,8 @@
 
 ## Установка
 
-1. Скачайте `MrMouseNavigation-Fabric-26.2-byMr712-v1.0.jar` со страницы на [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mr-mouse-navigation) или [GitHub Releases](https://github.com/byMr712/MrMouseNavigation-MinecraftMod/releases).
-2. Убедитесь, что у вас установлен **Fabric Loader** (мод не требует Fabric API).
+1. Скачайте `MrMouseNavigation-Fabric-26.2-byMr712-v1.0.jar` (для Fabric) или `MrMouseNavigation-NeoForge-26.2-byMr712-v1.0.jar` (для NeoForge) со страницы на [CurseForge](https://www.curseforge.com/minecraft/mc-mods/mr-mouse-navigation) или [GitHub Releases](https://github.com/byMr712/MrMouseNavigation-MinecraftMod/releases).
+2. Убедитесь, что у вас установлен **Fabric Loader** или **NeoForge** (мод не требует сторонних API).
 3. Поместите скачанный `.jar` файл в папку `.minecraft/mods`.
 4. Запустите игру.
 
@@ -98,7 +99,9 @@
    ```bash
    ./gradlew build
    ```
-3. Собранный файл будет находиться в `build/libs/MrMouseNavigation-Fabric-26.2-byMr712-v1.0.jar`.
+3. Собранные файлы будут находиться в `build/libs/`:
+   - `MrMouseNavigation-Fabric-26.2-byMr712-v1.0.jar` (Fabric)
+   - `MrMouseNavigation-NeoForge-26.2-byMr712-v1.0.jar` (NeoForge)
 
 ## Лицензия
 
