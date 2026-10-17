@@ -31,8 +31,8 @@ public class MouseNavigationConfig {
     public boolean enableScreenBack = true;
     public boolean enableScreenForward = true;
     public boolean enableBooks = true;
-    public boolean enableRecipeBook = true;
-    public boolean enableCreativeTabs = true;
+    public boolean enableRecipeBook = false;
+    public boolean enableCreativeTabs = false;
     public boolean enableAdvancements = true;
     public boolean enableChatHistory = true;
     public boolean enableChatMiddleClickSend = true;
@@ -81,8 +81,8 @@ public class MouseNavigationConfig {
         this.enableScreenBack = true;
         this.enableScreenForward = true;
         this.enableBooks = true;
-        this.enableRecipeBook = true;
-        this.enableCreativeTabs = true;
+        this.enableRecipeBook = false;
+        this.enableCreativeTabs = false;
         this.enableAdvancements = true;
         this.enableChatHistory = true;
         this.enableChatMiddleClickSend = true;
